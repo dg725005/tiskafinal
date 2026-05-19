@@ -20,7 +20,14 @@ const zoomOverlay = document.getElementById('zoom-overlay');
 const zoomTrack = document.getElementById('zoom-track');
 const closeBtn = document.getElementById('close-zoom-btn');
 
+// Swipe, Panning and Multi-touch Scale state trackers
 let pointX = 0, startX = 0, isDragging = false;
+let activePointers = [];
+let initialImgScale = 1;
+let currentImgScale = 1;
+let initialDistance = 0;
+let imgPanX = 0, imgPanY = 0;
+let startPanX = 0, startPanY = 0;
 
 // PERFORMANCE METRIC CONSTANT: How many images to append per batch on mobile
 const BATCH_SIZE = 12;
@@ -36,9 +43,10 @@ function sortFilesNumerically(filesArray) {
     });
 }
 
-// FULL VIEWPORT ZOOM SWIPING AND GESTURES PIPELINE
+// FULL VIEWPORT ZOOM GESTURES PIPELINE
 function openZoom(fileName, categoryKey) {
     zoomTrack.innerHTML = '';
+    resetZoomState();
     
     const fileList = galleryData[categoryKey]; 
     if (!fileList || fileList.length === 0) return;
@@ -54,7 +62,7 @@ function openZoom(fileName, categoryKey) {
         box.className = 'zoom-photo-box';
         if (file) {
             const imgClass = (i === 1) ? 'zoom-main-photo' : 'zoom-neighbor-photo';
-            box.innerHTML = `<img src="${folderPath}/${file}" class="${imgClass}" alt="Lookbook Zoom View Showcase Item">`;
+            box.innerHTML = `<img src="${folderPath}/${file}" class="${imgClass}" alt="Lookbook Zoom View Showcase Item" style="transform-origin: center center;">`;
         }
         zoomTrack.appendChild(box);
     });
@@ -67,33 +75,142 @@ function openZoom(fileName, categoryKey) {
     document.body.classList.add('lock-scroll');
 }
 
-function updateTransform() { zoomTrack.style.transform = `translateX(${pointX}px)`; }
+function updateTransform() { 
+    zoomTrack.style.transform = `translateX(${pointX}px)`; 
+}
+
+function updateImageTargetTransform() {
+    const mainImg = zoomTrack.querySelector('.zoom-main-photo');
+    if (mainImg) {
+        mainImg.style.transform = `translate(${imgPanX}px, ${imgPanY}px) scale(${currentImgScale})`;
+    }
+}
+
+function resetZoomState() {
+    currentImgScale = 1;
+    initialImgScale = 1;
+    imgPanX = 0;
+    imgPanY = 0;
+    activePointers = [];
+}
+
 function closeZoom() { 
     zoomOverlay.style.display = 'none'; 
     document.body.classList.remove('lock-scroll'); 
+    resetZoomState();
 }
 
-// WIRE TOUCH/POINTER EVENTS FOR ZOOM VIEWER SWIPING
+// MULTI-TOUCH POINTER TRACKING DELEGATES
 closeBtn.addEventListener('click', closeZoom);
+
 zoomOverlay.addEventListener('pointerdown', e => {
     if(e.target === closeBtn) return;
-    isDragging = true;
-    startX = e.clientX - pointX;
-    zoomTrack.style.transition = 'none';
+    activePointers.push(e);
+    
+    // If double-tapped/clicked, toggle quick zoom scale factors
+    if (e.target.classList.contains('zoom-main-photo')) {
+        if (e.detail === 2) { 
+            if (currentImgScale > 1) {
+                resetZoomState();
+            } else {
+                currentImgScale = 2.5;
+            }
+            zoomTrack.querySelector('.zoom-main-photo').style.transition = 'transform 0.2s ease';
+            updateImageTargetTransform();
+            return;
+        }
+    }
+
+    if (activePointers.length === 1) {
+        // Clear quick transitions if dragging
+        const mainImg = zoomTrack.querySelector('.zoom-main-photo');
+        if (mainImg) mainImg.style.transition = 'none';
+
+        if (currentImgScale > 1) {
+            // Pan image internally if scaled up
+            isDragging = true;
+            startPanX = e.clientX - imgPanX;
+            startPanY = e.clientY - imgPanY;
+        } else {
+            // Swipe slider track if normal scale
+            isDragging = true;
+            startX = e.clientX - pointX;
+            zoomTrack.style.transition = 'none';
+        }
+    } else if (activePointers.length === 2) {
+        // Initialize Pinch-to-Zoom metrics configuration blocks
+        isDragging = false; 
+        const mainImg = zoomTrack.querySelector('.zoom-main-photo');
+        if (mainImg) mainImg.style.transition = 'none';
+        
+        initialDistance = Math.hypot(
+            activePointers[0].clientX - activePointers[1].clientX,
+            activePointers[0].clientY - activePointers[1].clientY
+        );
+        initialImgScale = currentImgScale;
+    }
     zoomOverlay.setPointerCapture(e.pointerId);
 });
+
 zoomOverlay.addEventListener('pointermove', e => {
-    if (!isDragging) return;
-    pointX = e.clientX - startX;
-    updateTransform();
+    // Update active cache coordinate points
+    const index = activePointers.findIndex(p => p.pointerId === e.pointerId);
+    if (index !== -1) activePointers[index] = e;
+
+    if (!isDragging && activePointers.length === 2) {
+        // Process pinch mechanics dynamically
+        const currentDistance = Math.hypot(
+            activePointers[0].clientX - activePointers[1].clientX,
+            activePointers[0].clientY - activePointers[1].clientY
+        );
+        
+        const factor = currentDistance / initialDistance;
+        currentImgScale = Math.min(Math.max(initialImgScale * factor, 1), 4); // Caps zoom between 1x and 4x
+        
+        if (currentImgScale === 1) {
+            imgPanX = 0;
+            imgPanY = 0;
+        }
+        updateImageTargetTransform();
+    } 
+    
+    if (isDragging && activePointers.length === 1) {
+        if (currentImgScale > 1) {
+            // Drag and explore image frame components details
+            imgPanX = e.clientX - startPanX;
+            imgPanY = e.clientY - startPanY;
+            updateImageTargetTransform();
+        } else {
+            // Drag track horizontally standard sliding gallery layout
+            pointX = e.clientX - startX;
+            updateTransform();
+        }
+    }
 });
+
 zoomOverlay.addEventListener('pointerup', e => {
+    activePointers = activePointers.filter(p => p.pointerId !== e.pointerId);
+    
+    if (activePointers.length < 2 && currentImgScale > 1) {
+        // Reset anchor points smoothly to allow continued panning after pinch release
+        isDragging = false; 
+    }
+
+    if (isDragging && activePointers.length === 0) {
+        isDragging = false;
+        if (currentImgScale === 1) {
+            const itemWidth = window.innerWidth;
+            zoomTrack.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+            const targetIdx = Math.round(Math.abs(pointX) / itemWidth);
+            pointX = -(Math.min(Math.max(0, targetIdx), 2) * itemWidth);
+            updateTransform();
+        }
+    }
+});
+
+zoomOverlay.addEventListener('pointercancel', e => {
+    activePointers = [];
     isDragging = false;
-    const itemWidth = window.innerWidth;
-    zoomTrack.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
-    const targetIdx = Math.round(Math.abs(pointX) / itemWidth);
-    pointX = -(Math.min(Math.max(0, targetIdx), 2) * itemWidth);
-    updateTransform();
 });
 
 // SINGLE UI GRID ELEMENT FACTORY
@@ -109,7 +226,7 @@ function createGridCard(categoryKey, fileName, folderPath) {
     
     const img = document.createElement('img');
     img.src = url; 
-    img.loading = "lazy"; /* Native browser lazy loading optimized */
+    img.loading = "lazy";
     img.alt = `${categoryKey} gallery catalog choice`;
     
     img.onerror = () => { card.style.display = 'none'; };
@@ -140,7 +257,6 @@ function renderNextBatch(categoryKey, targetGrid, nextTriggerBtn) {
         targetGrid.appendChild(card);
     }
 
-    // Hide or update the batch button trigger dynamically based on allocation states
     if (nextLimit >= fileList.length) {
         if (nextTriggerBtn) nextTriggerBtn.style.display = 'none';
     } else {
@@ -154,7 +270,6 @@ function initializeGallery() {
         const meta = categoryMeta[key];
         let structuredFiles = [];
 
-        // Structural loop allocation limits mappings patterns setup tracks
         for (let i = 0; i < meta.count; i++) {
             structuredFiles.push(`${meta.prefix}${i}.webp`);
         }
@@ -183,15 +298,13 @@ function initializeGallery() {
         `;
         root.appendChild(section);
 
-        // 3. Process Batch Allocations to save system threading layout memory overhead
+        // 3. Process Batch Allocations
         if (meta.count > 0) {
             const targetGrid = document.getElementById(`grid-${key}`);
             const loadBtn = document.getElementById(`btn-load-${key}`);
 
-            // Initialize the initial view batch allocation sizing frame
             renderNextBatch(key, targetGrid, loadBtn);
 
-            // If the total images list length exceeds initial bounds, show the Load More handler mechanism
             if (meta.count > BATCH_SIZE) {
                 loadBtn.style.display = 'flex';
                 loadBtn.onclick = () => renderNextBatch(key, targetGrid, loadBtn);
@@ -200,5 +313,5 @@ function initializeGallery() {
     });
 }
 
-// Run deployment system mount execution pipelines loop runtime initialize execution
+// Run deployment system mount execution runtime pipeline loop
 initializeGallery();
