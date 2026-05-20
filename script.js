@@ -107,7 +107,6 @@ zoomOverlay.addEventListener('pointerdown', e => {
     if(e.target === closeBtn) return;
     activePointers.push(e);
     
-    // If double-tapped/clicked, toggle quick zoom scale factors
     if (e.target.classList.contains('zoom-main-photo')) {
         if (e.detail === 2) { 
             if (currentImgScale > 1) {
@@ -122,23 +121,19 @@ zoomOverlay.addEventListener('pointerdown', e => {
     }
 
     if (activePointers.length === 1) {
-        // Clear quick transitions if dragging
         const mainImg = zoomTrack.querySelector('.zoom-main-photo');
         if (mainImg) mainImg.style.transition = 'none';
 
         if (currentImgScale > 1) {
-            // Pan image internally if scaled up
             isDragging = true;
             startPanX = e.clientX - imgPanX;
             startPanY = e.clientY - imgPanY;
         } else {
-            // Swipe slider track if normal scale
             isDragging = true;
             startX = e.clientX - pointX;
             zoomTrack.style.transition = 'none';
         }
     } else if (activePointers.length === 2) {
-        // Initialize Pinch-to-Zoom metrics configuration blocks
         isDragging = false; 
         const mainImg = zoomTrack.querySelector('.zoom-main-photo');
         if (mainImg) mainImg.style.transition = 'none';
@@ -153,19 +148,17 @@ zoomOverlay.addEventListener('pointerdown', e => {
 });
 
 zoomOverlay.addEventListener('pointermove', e => {
-    // Update active cache coordinate points
     const index = activePointers.findIndex(p => p.pointerId === e.pointerId);
     if (index !== -1) activePointers[index] = e;
 
     if (!isDragging && activePointers.length === 2) {
-        // Process pinch mechanics dynamically
         const currentDistance = Math.hypot(
             activePointers[0].clientX - activePointers[1].clientX,
             activePointers[0].clientY - activePointers[1].clientY
         );
         
         const factor = currentDistance / initialDistance;
-        currentImgScale = Math.min(Math.max(initialImgScale * factor, 1), 4); // Caps zoom between 1x and 4x
+        currentImgScale = Math.min(Math.max(initialImgScale * factor, 1), 4);
         
         if (currentImgScale === 1) {
             imgPanX = 0;
@@ -176,12 +169,10 @@ zoomOverlay.addEventListener('pointermove', e => {
     
     if (isDragging && activePointers.length === 1) {
         if (currentImgScale > 1) {
-            // Drag and explore image frame components details
             imgPanX = e.clientX - startPanX;
             imgPanY = e.clientY - startPanY;
             updateImageTargetTransform();
         } else {
-            // Drag track horizontally standard sliding gallery layout
             pointX = e.clientX - startX;
             updateTransform();
         }
@@ -192,7 +183,6 @@ zoomOverlay.addEventListener('pointerup', e => {
     activePointers = activePointers.filter(p => p.pointerId !== e.pointerId);
     
     if (activePointers.length < 2 && currentImgScale > 1) {
-        // Reset anchor points smoothly to allow continued panning after pinch release
         isDragging = false; 
     }
 
@@ -236,7 +226,18 @@ function createGridCard(categoryKey, fileName, folderPath) {
     btn.innerText = "INQUIRE ON WHATSAPP";
     btn.onclick = (e) => { 
         e.stopPropagation(); 
-        window.open(`https://wa.me/${waNumber}?text=Hello, I would like to check availability status for this design selection: ${window.location.origin}/${url}`, '_blank'); 
+        
+        // Dynamically compute absolute path context to handle subfolder environments gracefully
+        let basePath = window.location.origin + window.location.pathname;
+        if (basePath.endsWith('index.html')) {
+            basePath = basePath.replace('index.html', '');
+        }
+        if (!basePath.endsWith('/')) {
+            basePath += '/';
+        }
+        
+        const absoluteImgUrl = `${basePath}${url}`;
+        window.open(`https://wa.me/${waNumber}?text=Hello, I would like to check availability status for this design selection: ${absoluteImgUrl}`, '_blank'); 
     };
 
     frame.appendChild(img);
@@ -276,14 +277,12 @@ function initializeGallery() {
 
         galleryData[key] = sortFilesNumerically(structuredFiles);
 
-        // 1. Build Mobile Horizontal Navigation targets
         if (meta.count > 0) {
             const li = document.createElement('li');
             li.innerHTML = `<a href="#section-${key}">${meta.title}</a>`;
             navList.appendChild(li);
         }
 
-        // 2. Build Category Container Section blocks
         const section = document.createElement('section');
         section.className = 'section-wrap';
         section.id = `section-${key}`;
@@ -298,7 +297,6 @@ function initializeGallery() {
         `;
         root.appendChild(section);
 
-        // 3. Process Batch Allocations
         if (meta.count > 0) {
             const targetGrid = document.getElementById(`grid-${key}`);
             const loadBtn = document.getElementById(`btn-load-${key}`);
