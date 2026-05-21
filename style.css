@@ -1,5 +1,5 @@
 :root {
-    --bg-neutral: #F7F5F2; /* Slightly brightened for clarity on mobile displays */
+    --bg-neutral: #F7F5F2;
     --card-white: #FFFFFF;
     --text-dark: #232323;
     --accent-gold: #846B43;
@@ -9,7 +9,6 @@
     --border-light: #EAE7E2;
 }
 
-/* Eliminate tap delays and overflow issues on mobile layout devices */
 * { 
     box-sizing: border-box; 
     margin: 0; 
@@ -19,7 +18,7 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: 130px; /* Aligns jump links precisely with fixed header */
+    scroll-padding-top: 130px;
 }
 
 body { 
@@ -34,7 +33,6 @@ body {
 
 body.lock-scroll { overflow: hidden; position: fixed; width: 100%; }
 
-/* MOBILE EXPANSIVE HEADER DESIGN */
 header { 
     background: rgba(255, 255, 255, 0.97); 
     backdrop-filter: blur(20px); 
@@ -58,21 +56,20 @@ header {
 
 .logo-box img { height: 44px; width: auto; object-fit: contain; display: block; }
 
-/* HORIZONTAL SCROLL NAV TRACK FOR MOBILE VIEWPORTS */
 .mobile-nav-scroll {
     width: 100%;
     overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-    -webkit-overflow-scrolling: touch; /* Smooth iOS momentum scrolling */
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
 }
-.mobile-nav-scroll::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+.mobile-nav-scroll::-webkit-scrollbar { display: none; }
 
 nav ul { 
     display: flex; 
     list-style: none; 
     gap: 20px; 
     padding: 4px 8px;
-    width: max-content; /* Guarantees layout path doesn't wrap lines */
+    width: max-content;
 }
 
 nav a { 
@@ -88,7 +85,6 @@ nav a {
 }
 nav a:hover, nav a:active { color: var(--accent-gold); }
 
-/* MAIN VIEWPORT SPACING DISTRIBUTION */
 main { margin-top: 135px; flex: 1 0 auto; }
 
 .section-wrap { padding: 30px 16px 10px 16px; max-width: 1400px; margin: 0 auto; }
@@ -100,15 +96,13 @@ main { margin-top: 135px; flex: 1 0 auto; }
     padding-bottom: 8px;
 }
 
-/* Mobile-first fluid grid mapping layouts (Double-column layout standard) */
 .grid-container { 
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Forces clean 2-column look on phones */
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     width: 100%;
 }
 
-/* ENHANCED ACCESSIBLE CELL TILES */
 .photo-cover { 
     background: var(--card-white);
     border-radius: 12px;
@@ -117,7 +111,7 @@ main { margin-top: 135px; flex: 1 0 auto; }
     position: relative; 
     display: flex;
     flex-direction: column;
-    height: 290px; /* Uniform height layout container constraints */
+    height: 290px;
     justify-content: space-between;
 }
 
@@ -134,13 +128,12 @@ main { margin-top: 135px; flex: 1 0 auto; }
 }
 .cover-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-/* LARGE TOUCH-TARGET CTA BUTTONS (Minimum 44px alignment height) */
 .wa-order-btn { 
     background: var(--text-dark); 
     color: #FFF; 
     border: none; 
     width: 100%;
-    height: 44px; /* Exact programmatic tap-space target standard */
+    height: 44px;
     font-weight: 700; 
     font-size: 0.68rem; 
     letter-spacing: 1px; 
@@ -152,7 +145,6 @@ main { margin-top: 135px; flex: 1 0 auto; }
 }
 .wa-order-btn:active { background: var(--accent-gold); }
 
-/* ZOOM VIEWER OVERLAY STRUCTURE */
 #zoom-overlay { 
     position: fixed; 
     top: 0; 
@@ -174,11 +166,9 @@ main { margin-top: 135px; flex: 1 0 auto; }
 .zoom-photo-box { flex: 0 0 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
 .zoom-photo-box img { max-width: 95%; max-height: 80%; object-fit: contain; }
 
-/* Mobile interactive adjustments for preview items scaling layout scales */
 .zoom-main-photo { transform: scale(1); transition: transform 0.2s ease; }
 .zoom-neighbor-photo { transform: scale(0.9); opacity: 0.2; }
 
-/* High visibility mobile action targets */
 .close-zoom { 
     position: absolute; 
     top: 20px; 
@@ -193,7 +183,6 @@ main { margin-top: 135px; flex: 1 0 auto; }
     backdrop-filter: blur(5px);
 }
 
-/* FOOLPROOF DESKTOP RESPONSIVE HOOKS UPWARD */
 @media (min-width: 768px) {
     .header-inner { flex-direction: row; justify-content: space-between; padding: 20px 4%; gap: 0; }
     .logo-box img { height: 56px; }
@@ -220,7 +209,6 @@ footer {
 .footer-content p { color: var(--text-dark); font-size: 0.85rem; font-weight: 600; }
 .footer-content .footer-sub { color: var(--nav-muted); font-size: 0.75rem; margin-top: 6px; font-weight: 400; }
 
-/* PERSISTENT ACCESSIBILITY WA FLOATING PIN ICON */
 .wa-float { 
     position: fixed; 
     bottom: 20px; 

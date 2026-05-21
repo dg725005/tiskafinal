@@ -2,15 +2,26 @@ const waNumber = "919993636912";
 
 // CONFIGURATION PANEL: Dynamic content indexing profiles mapping data/ paths directly
 const categoryMeta = {
-    cocktail: { title: "Cocktail", folder: 'data/cocktail/webp', prefix: 'cocktail', count: 10 },
-    convocation: { title: "Convocation", folder: 'data/convocation/webp', prefix: 'convocation', count: 4 },
-    fancy_dress: { title: "Fancy Dress", folder: 'data/fancydress/webp', prefix: 'fancydress', count: 409 },
-    mascots: { title: "Mascots", folder: 'data/mascots/webp', prefix: 'mascot', count: 60 },
-    maternity: { title: "Maternity", folder: 'data/maternity/webp', prefix: 'maternity', count: 44 },
     prewedding: { title: "Prewedding", folder: 'data/prewedding/webp', prefix: 'prewedding', count: 23 },
-    saree: { title: "Saree", folder: 'data/saree/webp', prefix: 'saree', count: 10 }
+    maternity: { title: "Maternity", folder: 'data/maternity/webp', prefix: 'maternity', count: 44 },
+    cocktail: { title: "Cocktail", folder: 'data/cocktail/webp', prefix: 'cocktail', count: 10 },
+    saree: { title: "Saree", folder: 'data/saree/webp', prefix: 'saree', count: 10 },
+    convocation: { 
+        title: "Convocation", 
+        folder: 'data/convocation/webp', 
+        prefix: 'convocation', 
+        count: 15,
+        videos: [0, 1] // Registers convocation0.mp4 and convocation1.mp4 as native video files
+    },
+    fancy_dress: { title: "Fancy Dress", folder: 'data/fancydress/webp', prefix: 'fancydress', count: 409 },
+    mascots: { 
+        title: "Mascots", 
+        folder: 'data/mascots/webp', 
+        prefix: 'mascot', 
+        count: 67,
+        videos: [0] // Keeps mascot0.mp4 working perfectly
+    }
 };
-
 // Global application rendering lifecycles context store
 let galleryData = {};
 
@@ -43,8 +54,14 @@ function sortFilesNumerically(filesArray) {
     });
 }
 
+// Helper to detect if a specific file index is configured as a video
+function isVideoFile(categoryKey, index) {
+    const meta = categoryMeta[categoryKey];
+    return meta.videos && meta.videos.includes(index);
+}
+
 // FULL VIEWPORT ZOOM GESTURES PIPELINE
-function openZoom(fileName, categoryKey) {
+function openZoom(fileName, categoryKey, isVideo = false) {
     zoomTrack.innerHTML = '';
     resetZoomState();
     
@@ -60,9 +77,32 @@ function openZoom(fileName, categoryKey) {
     frames.forEach((file, i) => {
         const box = document.createElement('div');
         box.className = 'zoom-photo-box';
+        
         if (file) {
-            const imgClass = (i === 1) ? 'zoom-main-photo' : 'zoom-neighbor-photo';
-            box.innerHTML = `<img src="${folderPath}/${file}" class="${imgClass}" alt="Lookbook Zoom View Showcase Item" style="transform-origin: center center;">`;
+            const isCurrentCenter = (i === 1);
+            const fileIndex = parseInt(file.match(/\d+/)[0], 10);
+            const fileIsVideo = isVideoFile(categoryKey, fileIndex);
+
+            if (fileIsVideo) {
+                const video = document.createElement('video');
+                video.src = `${folderPath}/${file}`;
+                video.className = isCurrentCenter ? 'zoom-main-photo' : 'zoom-neighbor-photo';
+                video.style.maxHeight = "80%";
+                video.style.maxWidth = "95%";
+                video.style.objectFit = "contain";
+                
+                if (isCurrentCenter) {
+                    video.controls = true;
+                    video.autoplay = true;
+                    video.playsInline = true;
+                } else {
+                    video.muted = true;
+                }
+                box.appendChild(video);
+            } else {
+                const imgClass = isCurrentCenter ? 'zoom-main-photo' : 'zoom-neighbor-photo';
+                box.innerHTML = `<img src="${folderPath}/${file}" class="${imgClass}" alt="Showcase Asset" style="transform-origin: center center;">`;
+            }
         }
         zoomTrack.appendChild(box);
     });
@@ -79,6 +119,7 @@ function updateTransform() {
     zoomTrack.style.transform = `translateX(${pointX}px)`; 
 }
 
+// Custom handler for image layout scale changes
 function updateImageTargetTransform() {
     const mainImg = zoomTrack.querySelector('.zoom-main-photo');
     if (mainImg) {
@@ -204,49 +245,55 @@ zoomOverlay.addEventListener('pointercancel', e => {
 });
 
 // SINGLE UI GRID ELEMENT FACTORY
-function createGridCard(categoryKey, fileName, folderPath) {
+function createGridCard(categoryKey, fileName, folderPath, isVideo = false) {
     const url = `${folderPath}/${fileName}`;
     const card = document.createElement('div');
     card.className = 'photo-cover';
     
-    card.onclick = () => { openZoom(fileName, categoryKey); };
+    card.onclick = () => { openZoom(fileName, categoryKey, isVideo); };
 
     const frame = document.createElement('div');
     frame.className = 'cover-frame';
     
-    const img = document.createElement('img');
-    img.src = url; 
-    img.loading = "lazy";
-    img.alt = `${categoryKey} gallery catalog choice`;
-    
-    img.onerror = () => { card.style.display = 'none'; };
+    if (isVideo) {
+        const video = document.createElement('video');
+        video.src = url;
+        video.muted = true;
+        video.autoplay = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.style.width = "100%";
+        video.style.height = "100%";
+        video.style.objectFit = "contain";
+        frame.appendChild(video);
+    } else {
+        const img = document.createElement('img');
+        img.src = url; 
+        img.loading = "lazy";
+        img.alt = `${categoryKey} gallery catalog choice`;
+        img.onerror = () => { card.style.display = 'none'; };
+        frame.appendChild(img);
+    }
     
     const btn = document.createElement('button');
     btn.className = 'wa-order-btn';
     btn.innerText = "INQUIRE ON WHATSAPP";
     btn.onclick = (e) => { 
         e.stopPropagation(); 
-        
-        // Dynamically compute absolute path context to handle subfolder environments gracefully
         let basePath = window.location.origin + window.location.pathname;
-        if (basePath.endsWith('index.html')) {
-            basePath = basePath.replace('index.html', '');
-        }
-        if (!basePath.endsWith('/')) {
-            basePath += '/';
-        }
+        if (basePath.endsWith('index.html')) basePath = basePath.replace('index.html', '');
+        if (!basePath.endsWith('/')) basePath += '/';
         
         const absoluteImgUrl = `${basePath}${url}`;
         window.open(`https://wa.me/${waNumber}?text=Hello, I would like to check availability status for this design selection: ${absoluteImgUrl}`, '_blank'); 
     };
 
-    frame.appendChild(img);
     card.appendChild(frame);
     card.appendChild(btn);
     return card;
 }
 
-// BATCH RENDERING MODULE: Appends image nodes in steps to preserve UI responsiveness on mobile devices
+// BATCH RENDERING MODULE: Appends nodes smoothly to preserve UI thread processing cycles
 function renderNextBatch(categoryKey, targetGrid, nextTriggerBtn) {
     const fileList = galleryData[categoryKey];
     const currentRenderedCount = targetGrid.children.length;
@@ -254,7 +301,11 @@ function renderNextBatch(categoryKey, targetGrid, nextTriggerBtn) {
     const folderPath = categoryMeta[categoryKey].folder;
 
     for (let i = currentRenderedCount; i < nextLimit; i++) {
-        const card = createGridCard(categoryKey, fileList[i], folderPath);
+        const fileName = fileList[i];
+        const fileIndex = parseInt(fileName.match(/\d+/)[0], 10);
+        const isVideo = isVideoFile(categoryKey, fileIndex);
+        
+        const card = createGridCard(categoryKey, fileName, folderPath, isVideo);
         targetGrid.appendChild(card);
     }
 
@@ -272,7 +323,11 @@ function initializeGallery() {
         let structuredFiles = [];
 
         for (let i = 0; i < meta.count; i++) {
-            structuredFiles.push(`${meta.prefix}${i}.webp`);
+            if (isVideoFile(key, i)) {
+                structuredFiles.push(`${meta.prefix}${i}.mp4`);
+            } else {
+                structuredFiles.push(`${meta.prefix}${i}.webp`);
+            }
         }
 
         galleryData[key] = sortFilesNumerically(structuredFiles);
@@ -311,5 +366,101 @@ function initializeGallery() {
     });
 }
 
-// Run deployment system mount execution runtime pipeline loop
 initializeGallery();
+
+// ==========================================
+// ADMIN INJECTION SYSTEM FOR STATIC HOSTING
+// ==========================================
+const SECRET_PIN = "7250";
+
+const adminFab = document.getElementById('admin-trigger-fab');
+const adminModal = document.getElementById('admin-modal');
+const authStep = document.getElementById('auth-step');
+const uploadStep = document.getElementById('upload-step');
+const adminPinInput = document.getElementById('admin-pin');
+const verifyPinBtn = document.getElementById('btn-verify-pin');
+const submitUploadBtn = document.getElementById('btn-submit-upload');
+const closeModalBtn = document.getElementById('btn-close-modal');
+const uploadCategorySelect = document.getElementById('upload-category');
+const uploadFileInput = document.getElementById('upload-file');
+
+adminFab.addEventListener('click', () => {
+    adminPinInput.value = "";
+    authStep.style.display = "block";
+    uploadStep.style.display = "none";
+    adminModal.style.display = "flex";
+    
+    uploadCategorySelect.innerHTML = "";
+    Object.keys(categoryMeta).forEach(key => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.innerText = categoryMeta[key].title;
+        uploadCategorySelect.appendChild(option);
+    });
+});
+
+verifyPinBtn.addEventListener('click', () => {
+    if (adminPinInput.value === SECRET_PIN) {
+        authStep.style.display = "none";
+        uploadStep.style.display = "block";
+    } else {
+        alert("Invalid Authorization Code. Please try again.");
+        adminPinInput.value = "";
+    }
+});
+
+submitUploadBtn.addEventListener('click', () => {
+    const selectedCategory = uploadCategorySelect.value;
+    const file = uploadFileInput.files[0];
+
+    if (!file) {
+        alert("Please choose an image file first.");
+        return;
+    }
+
+    const readerUrl = URL.createObjectURL(file);
+    const targetGrid = document.getElementById(`grid-${selectedCategory}`);
+    const targetSection = document.getElementById(`section-${selectedCategory}`);
+
+    if (targetGrid) {
+        if (categoryMeta[selectedCategory].count === 0) {
+            targetSection.style.display = 'block';
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#section-${selectedCategory}">${categoryMeta[selectedCategory].title}</a>`;
+            navList.appendChild(li);
+        }
+
+        const card = createGridCard(selectedCategory, "", "");
+        const imgNode = card.querySelector('.cover-frame img');
+        if (imgNode) imgNode.src = readerUrl;
+
+        const waBtn = card.querySelector('.wa-order-btn');
+        if (waBtn) {
+            waBtn.onclick = (e) => {
+                e.stopPropagation();
+                window.open(`https://wa.me/${waNumber}?text=Hello, I am interested in checking custom availability for an upcoming item from your ${categoryMeta[selectedCategory].title} collection: [File Ref: ${file.name}]`, '_blank');
+            };
+        }
+
+        card.onclick = () => {
+            zoomTrack.innerHTML = '';
+            resetZoomState();
+            const box = document.createElement('div');
+            box.className = 'zoom-photo-box';
+            box.innerHTML = `<img src="${readerUrl}" class="zoom-main-photo" alt="Temporary Preview Asset" style="transform-origin: center center;">`;
+            zoomTrack.appendChild(box);
+            
+            pointX = 0;
+            zoomTrack.style.transform = `translateX(0px)`;
+            zoomOverlay.style.display = 'block';
+            document.body.classList.add('lock-scroll');
+        };
+
+        targetGrid.insertBefore(card, targetGrid.firstChild);
+        adminModal.style.display = "none";
+        uploadFileInput.value = "";
+        alert(`Successfully injected "${file.name}" to the top of the ${categoryMeta[selectedCategory].title} catalog preview!`);
+    }
+});
+
+closeModalBtn.addEventListener('click', () => { adminModal.style.display = "none"; });
