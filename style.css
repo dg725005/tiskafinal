@@ -18,7 +18,7 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: 130px;
+    scroll-padding-top: 175px; /* Ensures category links anchor precisely under the header layout */
 }
 
 body { 
@@ -31,8 +31,43 @@ body {
     overflow-x: hidden; 
 }
 
-body.lock-scroll { overflow: hidden; position: fixed; width: 100%; }
+body.lock-scroll { 
+    overflow: hidden; 
+    position: fixed; 
+    width: 100%; 
+}
 
+/* ==========================================
+   ANNOUNCEMENT BAR STYLING
+   ========================================== */
+.announcement-bar {
+    background: var(--text-dark);
+    color: #FFFFFF;
+    padding: 8px 16px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-align: center;
+    width: 100%;
+}
+
+.announcement-track {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.announcement-track .divider {
+    color: var(--accent-gold);
+    font-weight: 400;
+}
+
+/* ==========================================
+   HEADER & NAVIGATION STYLING
+   ========================================== */
 header { 
     background: rgba(255, 255, 255, 0.97); 
     backdrop-filter: blur(20px); 
@@ -54,7 +89,41 @@ header {
     gap: 12px;
 }
 
-.logo-box img { height: 44px; width: auto; object-fit: contain; display: block; }
+.logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.logo-box img { 
+    height: 44px; 
+    width: auto; 
+    object-fit: contain; 
+    display: block; 
+}
+
+/* Home External Link Button Styling */
+.home-btn {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    border: 1px solid var(--text-dark);
+    border-radius: 6px;
+    background: transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.home-btn:active {
+    background: var(--text-dark);
+    color: #FFFFFF;
+}
 
 .mobile-nav-scroll {
     width: 100%;
@@ -62,7 +131,9 @@ header {
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
 }
-.mobile-nav-scroll::-webkit-scrollbar { display: none; }
+.mobile-nav-scroll::-webkit-scrollbar { 
+    display: none; 
+}
 
 nav ul { 
     display: flex; 
@@ -83,11 +154,24 @@ nav a {
     padding: 6px 4px;
     display: inline-block;
 }
-nav a:hover, nav a:active { color: var(--accent-gold); }
+nav a:hover, nav a:active { 
+    color: var(--accent-gold); 
+}
 
-main { margin-top: 135px; flex: 1 0 auto; }
+/* ==========================================
+   MAIN LAYOUT & GRID CONTENT
+   ========================================== */
+main { 
+    margin-top: 175px; /* Pushes gallery space safely below the fixed header layout heights */
+    flex: 1 0 auto; 
+}
 
-.section-wrap { padding: 30px 16px 10px 16px; max-width: 1400px; margin: 0 auto; }
+.section-wrap { 
+    padding: 30px 16px 10px 16px; 
+    max-width: 1400px; 
+    margin: 0 auto; 
+}
+
 .section-title { 
     margin-bottom: 20px; 
     font-family: 'Playfair Display', serif; 
@@ -126,8 +210,15 @@ main { margin-top: 135px; flex: 1 0 auto; }
     justify-content: center; 
     cursor: pointer; 
 }
-.cover-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.cover-frame img { 
+    max-width: 100%; 
+    max-height: 100%; 
+    object-fit: contain; 
+}
 
+/* ==========================================
+   BUTTONS & ACTIONS
+   ========================================== */
 .wa-order-btn { 
     background: var(--text-dark); 
     color: #FFF; 
@@ -143,8 +234,35 @@ main { margin-top: 135px; flex: 1 0 auto; }
     align-items: center;
     justify-content: center;
 }
-.wa-order-btn:active { background: var(--accent-gold); }
+.wa-order-btn:active { 
+    background: var(--accent-gold); 
+}
 
+.wa-float { 
+    position: fixed; 
+    bottom: 20px; 
+    right: 20px; 
+    width: 54px; 
+    height: 54px; 
+    background: #25D366; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 900; 
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2); 
+}
+.wa-float:active { 
+    transform: scale(0.95); 
+}
+
+#admin-trigger-fab {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* ==========================================
+   ZOOM SYSTEM OVERLAY
+   ========================================== */
 #zoom-overlay { 
     position: fixed; 
     top: 0; 
@@ -163,12 +281,26 @@ main { margin-top: 135px; flex: 1 0 auto; }
     height: 100%; 
     will-change: transform; 
 }
-.zoom-photo-box { flex: 0 0 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
-.zoom-photo-box img { max-width: 95%; max-height: 80%; object-fit: contain; }
-
-.zoom-main-photo { transform: scale(1); transition: transform 0.2s ease; }
-.zoom-neighbor-photo { transform: scale(0.9); opacity: 0.2; }
-
+.zoom-photo-box { 
+    flex: 0 0 100vw; 
+    height: 100vh; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+.zoom-photo-box img { 
+    max-width: 95%; 
+    max-height: 80%; 
+    object-fit: contain; 
+}
+.zoom-main-photo { 
+    transform: scale(1); 
+    transition: transform 0.2s ease; 
+}
+.zoom-neighbor-photo { 
+    transform: scale(0.9); 
+    opacity: 0.2; 
+}
 .close-zoom { 
     position: absolute; 
     top: 20px; 
@@ -177,27 +309,20 @@ main { margin-top: 135px; flex: 1 0 auto; }
     color: #fff; 
     cursor: pointer; 
     z-index: 10001; 
-    width: 50px; height: 50px; 
-    display: flex; align-items: center; justify-content: center; 
-    background: rgba(255,255,255,0.15); border-radius: 50%; line-height: 1;
+    width: 50px; 
+    height: 50px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: rgba(255,255,255,0.15); 
+    border-radius: 50%; 
+    line-height: 1;
     backdrop-filter: blur(5px);
 }
 
-@media (min-width: 768px) {
-    .header-inner { flex-direction: row; justify-content: space-between; padding: 20px 4%; gap: 0; }
-    .logo-box img { height: 56px; }
-    .mobile-nav-scroll { width: auto; overflow: visible; }
-    nav ul { gap: 28px; padding: 0; }
-    main { margin-top: 110px; }
-    .section-wrap { padding: 40px 4% 20px 4%; }
-    .section-title { font-size: 2.2rem; }
-    .grid-container { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; }
-    .photo-cover { height: 400px; padding: 12px; }
-    .cover-frame { height: calc(100% - 60px); }
-    .wa-order-btn { height: 48px; font-size: 0.75rem; letter-spacing: 1.5px; }
-    .close-zoom { top: 35px; right: 35px; width: 60px; height: 60px; font-size: 3rem; }
-}
-
+/* ==========================================
+   FOOTER STYLING
+   ========================================== */
 footer {
     background: #FFFFFF;
     border-top: 1px solid var(--border-light);
@@ -206,19 +331,85 @@ footer {
     text-align: center;
     flex-shrink: 0;
 }
-.footer-content p { color: var(--text-dark); font-size: 0.85rem; font-weight: 600; }
-.footer-content .footer-sub { color: var(--nav-muted); font-size: 0.75rem; margin-top: 6px; font-weight: 400; }
-
-.wa-float { 
-    position: fixed; 
-    bottom: 20px; 
-    right: 20px; 
-    width: 54px; 
-    height: 54px; 
-    background: #25D366; 
-    border-radius: 50%; 
-    display: flex; align-items: center; justify-content: center; 
-    z-index: 900; 
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2); 
+.footer-content p { 
+    color: var(--text-dark); 
+    font-size: 0.85rem; 
+    font-weight: 600; 
 }
-.wa-float:active { transform: scale(0.95); }
+.footer-content .footer-sub { 
+    color: var(--nav-muted); 
+    font-size: 0.75rem; 
+    margin-top: 6px; 
+    font-weight: 400; 
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN SYSTEM (DESKTOP / TABLET)
+   ========================================== */
+@media (min-width: 768px) {
+    html {
+        scroll-padding-top: 150px;
+    }
+    main { 
+        margin-top: 150px; /* Header gets narrower layout alignment on desktop view */
+    }
+    .announcement-bar { 
+        font-size: 0.78rem; 
+        padding: 10px 4%; 
+    }
+    .logo-row {
+        width: auto;
+        gap: 24px;
+    }
+    .home-btn:hover {
+        background: var(--text-dark);
+        color: #FFFFFF;
+        cursor: pointer;
+    }
+    .header-inner { 
+        flex-direction: row; 
+        justify-content: space-between; 
+        padding: 20px 4%; 
+        gap: 0; 
+    }
+    .logo-box img { 
+        height: 56px; 
+    }
+    .mobile-nav-scroll { 
+        width: auto; 
+        overflow: visible; 
+    }
+    nav ul { 
+        gap: 28px; 
+        padding: 0; 
+    }
+    .section-wrap { 
+        padding: 40px 4% 20px 4%; 
+    }
+    .section-title { 
+        font-size: 2.2rem; 
+    }
+    .grid-container { 
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+        gap: 24px; 
+    }
+    .photo-cover { 
+        height: 400px; 
+        padding: 12px; 
+    }
+    .cover-frame { 
+        height: calc(100% - 60px); 
+    }
+    .wa-order-btn { 
+        height: 48px; 
+        font-size: 0.75rem; 
+        letter-spacing: 1.5px; 
+    }
+    .close-zoom { 
+        top: 35px; 
+        right: 35px; 
+        width: 60px; 
+        height: 60px; 
+        font-size: 3rem; 
+    }
+}
