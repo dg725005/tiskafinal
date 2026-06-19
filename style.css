@@ -18,7 +18,7 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: 175px; /* Ensures category links anchor precisely under the header layout */
+    scroll-padding-top: 155px; /* Perfect offset anchoring for condensed top dropdown navigation bar height */
 }
 
 body { 
@@ -66,7 +66,7 @@ body.lock-scroll {
 }
 
 /* ==========================================
-   HEADER & NAVIGATION STYLING
+   HEADER & ACTIONS STYLING
    ========================================== */
 header { 
     background: rgba(255, 255, 255, 0.97); 
@@ -97,72 +97,130 @@ header {
 }
 
 .logo-box img { 
-    height: 44px; 
+    height: 42px; 
     width: auto; 
     object-fit: contain; 
     display: block; 
 }
 
-/* Home External Link Button Styling */
-.home-btn {
-    text-decoration: none;
-    color: var(--text-dark);
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 6px 12px;
-    border: 1px solid var(--text-dark);
-    border-radius: 6px;
-    background: transparent;
-    transition: all 0.2s ease;
+/* Balanced Actions Area Positioning */
+.header-actions {
     display: flex;
     align-items: center;
 }
 
-.home-btn:active {
-    background: var(--text-dark);
-    color: #FFFFFF;
+/* Shifted towards the middle on desktop using a calculated right margin */
+.social-links {
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
-.mobile-nav-scroll {
-    width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-}
-.mobile-nav-scroll::-webkit-scrollbar { 
-    display: none; 
-}
-
-nav ul { 
-    display: flex; 
-    list-style: none; 
-    gap: 20px; 
-    padding: 4px 8px;
-    width: max-content;
+.social-links a {
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-nav a { 
-    text-decoration: none; 
-    color: var(--nav-muted); 
-    font-size: 0.75rem; 
-    text-transform: uppercase; 
-    letter-spacing: 1.5px; 
-    font-weight: 700; 
-    white-space: nowrap;
-    padding: 6px 4px;
+.social-links a:active {
+    color: var(--accent-gold);
+}
+
+.social-links .jd-icon span {
+    font-size: 0.62rem;
+    font-weight: 800;
+    border: 1.5px solid var(--text-dark);
+    padding: 1px 4px;
+    border-radius: 4px;
+    line-height: 1;
+    letter-spacing: -0.2px;
     display: inline-block;
 }
-nav a:hover, nav a:active { 
-    color: var(--accent-gold); 
+
+/* ==========================================
+   DROPDOWN MENU ARCHITECTURE
+   ========================================== */
+.explore-nav {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+}
+
+.dropdown-btn {
+    width: 100%;
+    background: var(--bg-neutral);
+    color: var(--text-dark);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.dropdown-btn:active {
+    background: #EAE7E2;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border: 1px solid var(--border-light);
+    z-index: 1010;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-content a {
+    color: var(--text-dark);
+    padding: 12px 18px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-bottom: 1px solid #FAF9F7;
+    transition: background 0.15s ease;
+}
+
+.dropdown-content a:last-child {
+    border-bottom: none;
+}
+
+.dropdown-content a:active {
+    background: var(--bg-neutral);
+    color: var(--accent-gold);
 }
 
 /* ==========================================
    MAIN LAYOUT & GRID CONTENT
    ========================================== */
 main { 
-    margin-top: 175px; /* Pushes gallery space safely below the fixed header layout heights */
+    margin-top: 155px; /* Ideal height clearance value avoids overlap across layouts */
     flex: 1 0 auto; 
 }
 
@@ -210,6 +268,7 @@ main {
     justify-content: center; 
     cursor: pointer; 
 }
+
 .cover-frame img { 
     max-width: 100%; 
     max-height: 100%; 
@@ -217,7 +276,7 @@ main {
 }
 
 /* ==========================================
-   BUTTONS & ACTIONS
+   BUTTONS & FLOAT ACTIONS
    ========================================== */
 .wa-order-btn { 
     background: var(--text-dark); 
@@ -234,9 +293,6 @@ main {
     align-items: center;
     justify-content: center;
 }
-.wa-order-btn:active { 
-    background: var(--accent-gold); 
-}
 
 .wa-float { 
     position: fixed; 
@@ -252,164 +308,75 @@ main {
     z-index: 900; 
     box-shadow: 0 4px 16px rgba(0,0,0,0.2); 
 }
-.wa-float:active { 
-    transform: scale(0.95); 
-}
 
-#admin-trigger-fab {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-}
-
-/* ==========================================
-   ZOOM SYSTEM OVERLAY
-   ========================================== */
 #zoom-overlay { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: var(--black-overlay); 
-    z-index: 9999; 
-    display: none; 
-    touch-action: none; 
-    overflow: hidden; 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--black-overlay); z-index: 9999; display: none; touch-action: none; overflow: hidden; 
 }
-#zoom-track { 
-    display: flex; 
-    width: auto; 
-    height: 100%; 
-    will-change: transform; 
-}
-.zoom-photo-box { 
-    flex: 0 0 100vw; 
-    height: 100vh; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-}
-.zoom-photo-box img { 
-    max-width: 95%; 
-    max-height: 80%; 
-    object-fit: contain; 
-}
-.zoom-main-photo { 
-    transform: scale(1); 
-    transition: transform 0.2s ease; 
-}
-.zoom-neighbor-photo { 
-    transform: scale(0.9); 
-    opacity: 0.2; 
-}
-.close-zoom { 
-    position: absolute; 
-    top: 20px; 
-    right: 20px; 
-    font-size: 2.5rem; 
-    color: #fff; 
-    cursor: pointer; 
-    z-index: 10001; 
-    width: 50px; 
-    height: 50px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    background: rgba(255,255,255,0.15); 
-    border-radius: 50%; 
-    line-height: 1;
-    backdrop-filter: blur(5px);
-}
+#zoom-track { display: flex; width: auto; height: 100%; will-change: transform; }
+.zoom-photo-box { flex: 0 0 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+.zoom-photo-box img { max-width: 95%; max-height: 80%; object-fit: contain; }
+.zoom-main-photo { transform: scale(1); transition: transform 0.2s ease; }
+.zoom-neighbor-photo { transform: scale(0.9); opacity: 0.2; }
+.close-zoom { position: absolute; top: 20px; right: 20px; font-size: 2.5rem; color: #fff; cursor: pointer; z-index: 10001; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.15); border-radius: 50%; line-height: 1; backdrop-filter: blur(5px); }
+
+footer { background: #FFFFFF; border-top: 1px solid var(--border-light); padding: 30px 16px; margin-top: 40px; text-align: center; flex-shrink: 0; }
+.footer-content p { color: var(--text-dark); font-size: 0.85rem; font-weight: 600; }
+.footer-content .footer-sub { color: var(--nav-muted); font-size: 0.75rem; margin-top: 6px; font-weight: 400; }
 
 /* ==========================================
-   FOOTER STYLING
-   ========================================== */
-footer {
-    background: #FFFFFF;
-    border-top: 1px solid var(--border-light);
-    padding: 30px 16px;
-    margin-top: 40px;
-    text-align: center;
-    flex-shrink: 0;
-}
-.footer-content p { 
-    color: var(--text-dark); 
-    font-size: 0.85rem; 
-    font-weight: 600; 
-}
-.footer-content .footer-sub { 
-    color: var(--nav-muted); 
-    font-size: 0.75rem; 
-    margin-top: 6px; 
-    font-weight: 400; 
-}
-
-/* ==========================================
-   RESPONSIVE DESIGN SYSTEM (DESKTOP / TABLET)
+   RESPONSIVE DESIGN UPGRADES (DESKTOP)
    ========================================== */
 @media (min-width: 768px) {
     html {
-        scroll-padding-top: 150px;
+        scroll-padding-top: 130px;
     }
     main { 
-        margin-top: 150px; /* Header gets narrower layout alignment on desktop view */
-    }
-    .announcement-bar { 
-        font-size: 0.78rem; 
-        padding: 10px 4%; 
-    }
-    .logo-row {
-        width: auto;
-        gap: 24px;
-    }
-    .home-btn:hover {
-        background: var(--text-dark);
-        color: #FFFFFF;
-        cursor: pointer;
+        margin-top: 130px; 
     }
     .header-inner { 
         flex-direction: row; 
         justify-content: space-between; 
-        padding: 20px 4%; 
+        padding: 14px 4%; 
         gap: 0; 
     }
     .logo-box img { 
-        height: 56px; 
-    }
-    .mobile-nav-scroll { 
-        width: auto; 
-        overflow: visible; 
-    }
-    nav ul { 
-        gap: 28px; 
-        padding: 0; 
-    }
-    .section-wrap { 
-        padding: 40px 4% 20px 4%; 
-    }
-    .section-title { 
-        font-size: 2.2rem; 
-    }
-    .grid-container { 
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-        gap: 24px; 
-    }
-    .photo-cover { 
-        height: 400px; 
-        padding: 12px; 
-    }
-    .cover-frame { 
-        height: calc(100% - 60px); 
-    }
-    .wa-order-btn { 
         height: 48px; 
-        font-size: 0.75rem; 
-        letter-spacing: 1.5px; 
     }
-    .close-zoom { 
-        top: 35px; 
-        right: 35px; 
-        width: 60px; 
-        height: 60px; 
-        font-size: 3rem; 
+    .logo-row {
+        width: auto;
+        flex-grow: 1;
     }
+    
+    /* Elegant alignment configuration to pull social elements inwards */
+    .header-actions {
+        flex-grow: 1;
+        justify-content: flex-end;
+        padding-right: 22%; /* Pulls the icons slightly into the middle of the desktop container layout */
+    }
+    .social-links {
+        gap: 18px;
+    }
+    .social-links a:hover {
+        color: var(--accent-gold);
+    }
+    .social-links .jd-icon span:hover {
+        border-color: var(--accent-gold);
+    }
+    .explore-nav { 
+        width: auto; 
+    }
+    .dropdown {
+        width: 220px;
+    }
+    .dropdown-btn:hover {
+        background: #EAE7E2;
+    }
+    .dropdown-content a:hover {
+        background: var(--bg-neutral);
+        color: var(--accent-gold);
+    }
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; }
+    .photo-cover { height: 400px; padding: 12px; }
+    .cover-frame { height: calc(100% - 60px); }
+    .wa-order-btn { height: 48px; font-size: 0.75rem; letter-spacing: 1.5px; }
 }
